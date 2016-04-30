@@ -175,8 +175,8 @@ void draw_util_image(unsigned char *pixels, surface_t *surface, int x, int y, in
             height,
             width * 4);
 
-    cairo_set_source_surface(surface->cr, image, 0, 0);
     cairo_set_operator(surface->cr, CAIRO_OPERATOR_OVER);
+    cairo_set_source_surface(surface->cr, image, x, y);
     cairo_rectangle(surface->cr, x, y, width, height);
     cairo_fill(surface->cr);
 
