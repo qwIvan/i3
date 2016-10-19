@@ -160,25 +160,30 @@ void draw_util_text(i3String *text, surface_t *surface, color_t fg_color, color_
  * surface as well as restoring the cairo state.
  *
  */
-void draw_util_image(unsigned char *pixels, surface_t *surface, int x, int y, int width, int height) {
+void draw_util_image(unsigned char *src, int src_width, int src_height, surface_t *surface, int x, int y, int width, int height) {
     RETURN_UNLESS_SURFACE_INITIALIZED(surface);
 
-#if CAIRO_SUPPORT
+#ifdef CAIRO_SUPPORT
+    double scale;
+
     cairo_save(surface->cr);
 
     cairo_surface_t *image;
 
     image = cairo_image_surface_create_for_data(
-            pixels,
+            src,
             CAIRO_FORMAT_ARGB32,
-            width,
-            height,
-            width * 4);
+            src_width,
+            src_height,
+            src_width * 4);
 
-    cairo_set_operator(surface->cr, CAIRO_OPERATOR_OVER);
-    cairo_set_source_surface(surface->cr, image, x, y);
-    cairo_rectangle(surface->cr, x, y, width, height);
-    cairo_fill(surface->cr);
+    cairo_translate(surface->cr, x, y);
+
+    scale = MIN((double) width / src_width, (double) height / src_height);
+    cairo_scale(surface->cr, scale, scale);
+
+    cairo_set_source_surface(surface->cr, image, 0, 0);
+    cairo_paint(surface->cr);
 
     cairo_surface_destroy(image);
 

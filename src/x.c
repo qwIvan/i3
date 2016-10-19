@@ -624,6 +624,8 @@ void x_draw_decoration(Con *con) {
 
         draw_util_image(
                 (unsigned char *)win->icon,
+                (int)win->icon_width,
+                (int)win->icon_height,
                 &(parent->frame_buffer),
                 con->deco_rect.x + indent_px - width,
                 con->deco_rect.y + icon_offset_y,

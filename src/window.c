@@ -369,40 +369,12 @@ void window_update_motif_hints(i3Window *win, xcb_get_property_reply_t *prop, bo
 #undef MWM_DECOR_TITLE
 }
 
-/*
- * Copy and resize icon if needed
- */
-void copy_icon_with_resize(uint32_t *dst, int width, int height, uint32_t* src, int s_width, int s_height)
-{
-    int i, j;
-
-    if (width == s_width && height == s_height) {
-        /* easy case, same dimensions, just copy data */
-        memcpy(dst, src, width*height*sizeof(uint32_t));
-        return;
-    }
-
-    uint32_t* row = src;
-    int xstep = s_width / width;
-    int ystep = s_height / height * s_width;
-
-    for (i=0; i < height; ++i) {
-        uint32_t* ptr = row;
-        for(j=0; j < width; ++j) {
-            *dst++ = *ptr;
-            ptr+=xstep;
-        }
-        row += ystep;
-    }
-}
-
-
 void window_update_icon(i3Window *win, xcb_get_property_reply_t *prop)
 {
     uint32_t *data = NULL;
     uint64_t len = 0;
 
-    if(!prop || prop->type != XCB_ATOM_CARDINAL || prop->format != 32) {
+    if (!prop || prop->type != XCB_ATOM_CARDINAL || prop->format != 32) {
         DLOG("_NET_WM_ICON is not set\n");
         FREE(prop);
         return;
@@ -446,9 +418,11 @@ void window_update_icon(i3Window *win, xcb_get_property_reply_t *prop)
 
     LOG("Got _NET_WM_ICON of size: (%d,%d)\n", data[0], data[1]);
 
-    FREE(win->icon);
-    win->icon = malloc(16 * 16 * sizeof(uint32_t));
-    copy_icon_with_resize(win->icon, 16, 16, data + 2, data[0], data[1]);
+    win->icon_width = data[0];
+    win->icon_height = data[1];
+
+    win->icon = malloc(len * 4);
+    memcpy(win->icon, &data[2], len * 4);
 
     FREE(prop);
 }

@@ -589,7 +589,7 @@ void draw_util_text(i3String *text, surface_t *surface, color_t fg_color, color_
 /**
  * Draw the given image using libi3.
  */
-void draw_util_image(unsigned char *pixels, surface_t *surface, int x, int y, int width, int height);
+void draw_util_image(unsigned char *src, int src_width, int src_height, surface_t *surface, int x, int y, int width, int height);
 
 /**
  * Draws a filled rectangle.
